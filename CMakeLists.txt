@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(SSA VERSION 0.1.0 LANGUAGES CXX)
+project(SSA VERSION 0.8.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,7 +30,9 @@ target_compile_definitions(SSA PRIVATE XPLM303 XPLM301 XPLM300 XPLM210 XPLM200)
 set_target_properties(SSA PROPERTIES PREFIX "" SUFFIX ".xpl")
 
 if(WIN32)
-  target_compile_definitions(SSA PRIVATE IBM=1)
+  # XPLM pulls in Windows headers. Prevent their min/max macros from replacing
+  # calls such as std::min and std::max in portable C++ code.
+  target_compile_definitions(SSA PRIVATE IBM=1 NOMINMAX WIN32_LEAN_AND_MEAN)
   target_link_libraries(SSA PRIVATE "${XPLANE_SDK_ROOT}/Libraries/Win/XPLM_64.lib")
 elseif(APPLE)
   target_compile_definitions(SSA PRIVATE APL=1)
@@ -45,4 +47,3 @@ if(MSVC)
 else()
   target_compile_options(SSA PRIVATE -Wall -Wextra -Wpedantic)
 endif()
-
